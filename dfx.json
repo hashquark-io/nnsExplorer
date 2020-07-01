@@ -1,0 +1,21 @@
+{
+    "canisters": {
+        "nnsexplorer": {
+            "main": "src/nnsexplorer/main.mo",
+            "frontend": {
+                "entrypoint": "src/nnsexplorer/public/main.js",
+                "assets": ["src/nnsexplorer/public/*.html", "src/nnsexplorer/public/*.css", "src/nnsexplorer/public/*.png"]
+            }
+        }
+    },
+    "defaults": {
+        "build": {
+            "output": "canisters"
+        },
+        "start": {
+            "address": "127.0.0.1",
+            "port": 8000
+        }
+    },
+    "dfx": "0.5.7"
+}

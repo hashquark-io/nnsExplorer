@@ -1,0 +1,26 @@
+[{
+        "accountAddr": "0x0b6438f10fdae49e48815c4b5222b562789fb9f6",
+        "description": "HashQuark",
+        "commissionRate": "10"
+    },
+    {
+        "accountAddr": "0x9b4a933052a735245aca6ddbe008c9027b5b4b0b",
+        "description": "Blockscale Sim",
+        "commissionRate": "10"
+    },
+    {
+        "accountAddr": "0xf3106c246373fdc98094f3eaa3cf7d0b515db9af",
+        "description": "DCCS Capital",
+        "commissionRate": "5"
+    },
+    {
+        "accountAddr": "0x7f85e6c1ead1c521c24a5cd4bb7caf9f49046f56",
+        "description": "Rock",
+        "commissionRate": "10"
+    },
+    {
+        "accountAddr": "0x8718a707562ed1d0d7a343e18e9c297d377d8636",
+        "description": "Frankfurt",
+        "commissionRate": "5"
+    }
+]
