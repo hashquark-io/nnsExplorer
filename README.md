@@ -1,10 +1,10 @@
 ## An open dfinity NNS explorer.
 
-[![Build Status](https://travis-ci.org/dfinity-lab/nnsexplorer.svg?branch=master)](https://travis-ci.org/dfinity-lab/nnsexplorer?branch=master)
-
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/dfinity-lab/nnsexplorer) 
+![Screenshot](screenshoots/1.png)
 
 ### Demo
+
+[Screenshot](./screenshoots/1.png)
 
 Install the required Node modules (only needed the first time).
 
