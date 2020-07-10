@@ -29,7 +29,6 @@
     "license": "Apache 2.0 with LLVM Exception",
     "name": "nnsexplorer",
     "scripts": {
-        "start": "parcel src/nnsexplorer/public/index.html",
         "build": "webpack",
         "sim": "node scripts/sim"
     },

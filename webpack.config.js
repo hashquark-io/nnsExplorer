@@ -11,8 +11,8 @@ const aliases = Object.entries(dfxJson.canisters).reduce((acc, [name, ]) => {
 
     return {
         ...acc,
-        ["ic:canisters/" + name]: path.join(outputRoot, "main.js"),
-        ["ic:idl/" + name]: path.join(outputRoot, "main.did.js"),
+        ["ic:canisters/" + name]: path.join(outputRoot, name + ".js"),
+        ["ic:idl/" + name]: path.join(outputRoot, name + ".did.js"),
     };
 }, {
     // This will later point to the userlib from npm, when we publish the userlib.
@@ -34,12 +34,13 @@ function generateWebpackConfigForCanister(name, info) {
 
     const outputRoot = path.join(__dirname, dfxJson.defaults.build.output, name);
     const inputRoot = __dirname;
-    const entry = path.join(inputRoot, info.frontend.entrypoint);
     const assets = info.frontend.assets;
 
     return {
         mode: "production",
-        entry,
+        entry: {
+            index: path.join(inputRoot, info.frontend.entrypoint),
+        },
         devtool: "source-map",
         optimization: {
             minimize: true,
@@ -52,15 +53,7 @@ function generateWebpackConfigForCanister(name, info) {
             filename: "index.js",
             path: path.join(outputRoot, "assets"),
         },
-        plugins: [
-            new CopyPlugin(assets.map(x => {
-                if (typeof x == "string") {
-                    return { from: path.join(inputRoot, x), to: path.join(outputRoot, "assets"), flatten: true };
-                } else {
-                    return {...x, from: path.join(inputRoot, x.from), to: path.join(outputRoot, "assets", x.to || '') };
-                }
-            })),
-        ],
+        plugins: [],
         module: {
             rules: [{
                     test: /\.css$/,
