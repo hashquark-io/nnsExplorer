@@ -4,7 +4,6 @@ import "bootstrap";
 // Make the nnsexplorer app's public methods available locally
 import nnsexplorer from "ic:canisters/nnsexplorer";
 import assets from "ic:canisters/nnsexp_assets";
-import { load, show, get, hide, update, bind } from "./utils";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "animate.css/animate.min.css";
@@ -14,7 +13,12 @@ window.$ = window.jQuery = $;
 
 assets
     .retrieve("index.html")
-    .then(load) // Load the static HTML and inject it into the DOM.
+    .then(function(array) {
+        let buffer = new Uint8Array(array);
+        const html = new TextDecoder().decode(buffer);
+        const el = new DOMParser().parseFromString(html, "text/html");
+        document.body.replaceChild(el.firstElementChild, document.getElementById('app'));
+    })
     .then(() =>
         $(document).ready(function() {
             // Show list of validators

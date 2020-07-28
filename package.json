@@ -13,6 +13,7 @@
         "wowjs": "^1.1.3"
     },
     "devDependencies": {
+        "@dfinity/agent": "/home/flanker/.cache/dfinity/versions/0.5.11/js-user-library",
         "css-loader": "^3.5.2",
         "node-crc": "^1.3.0",
         "node-fetch": "^2.6.0",
@@ -27,7 +28,7 @@
         "base64-inline-loader": "1.1.1"
     },
     "license": "Apache 2.0 with LLVM Exception",
-    "name": "nnsexplorer",
+    "name": "nnsexp_assets",
     "scripts": {
         "build": "webpack",
         "sim": "node scripts/sim"

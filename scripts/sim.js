@@ -56,7 +56,7 @@ const getCanisterPath = (canisterName) =>
 
 const getCandid = (canisterName) =>
     fs
-    .readFileSync(`${getCanisterPath(canisterName)}/main.did.js`)
+    .readFileSync(`${getCanisterPath(canisterName)}/${canisterName}.did.js`)
     .toString()
     .replace("export default ", "");
 
