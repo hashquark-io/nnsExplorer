@@ -16,7 +16,7 @@ Start the replica, then build and install the canisters.
 
 ```bash
 dfx start --background
-dfx build --skip-frontend
+dfx canister create --all
 dfx build
 dfx canister install --all
 ```
