@@ -1,4 +1,4 @@
-## An open dfinity NNS explorer.
+## An open DFINITY NNS Explorer.
 
 ![Screenshot](screenshoots/1.png)
 
@@ -21,4 +21,4 @@ dfx build
 dfx canister install --all
 ```
 
-Open the canister frontend in your web browser. (http://127.0.0.1:8000/?canisterId=ic:*******************)
+Open the canister frontend in your web browser. (http://127.0.0.1:8000/?canisterId=*******************)

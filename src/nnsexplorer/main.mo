@@ -128,15 +128,15 @@ actor nnsexplorer {
 
   // User Auth
 
-  public shared query(msg) func getOwnId(): async Principal { msg.caller }
+  public shared query(msg) func getOwnId(): async Principal { msg.caller };
 
   // Simulation
 
-  public shared query func startSim(): async () {
+  // public query func startSim(): async () {
 
-  }
+  // };
 
-  public shared query func stopSim(): async () {
+  // public query func stopSim(): async () {
     
-  }
+  // };
 };
