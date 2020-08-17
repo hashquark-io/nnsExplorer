@@ -1,19 +1,21 @@
-import Principal "mo:base/Principal";
-
 module {
-  public type UserId = Principal;
-
-  public type NewProfile = {
+  public type DFNAccount = {
     accountAddr: Text;
-    description: Text;
-    commissionRate: Text;
+    signature: Text;
   };
 
-  public type Profile = {
-    id: UserId;
+  public type NewNeuron = {
     accountAddr: Text;
-    totalNeurons: Text;
     description: Text;
     commissionRate: Text;
+    selfStaking: Nat64;
+  };
+
+  public type Neuron = {
+    accountAddr: Text;
+    description: Text;
+    commissionRate: Text;
+    selfStaking: Nat64;
+    totalDelegations: Nat64;
   };
 };
