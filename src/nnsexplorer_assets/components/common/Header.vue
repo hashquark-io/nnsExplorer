@@ -23,7 +23,7 @@
         </div>
         <!-- User avatar -->
         <div class="user-avator">
-          <img v-if="loggedin" src="../../assets/img/visitor.jpg" />
+          <img v-if="loggedin" src="../../assets/img/img.jpg" />
         </div>
         <!-- Signup button -->
         <el-button
@@ -48,10 +48,10 @@
             <i class="el-icon-caret-bottom"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <a href="javascript:;">
-              <!-- <a href="https://github.com/hashquark-io/nnsExplorer" target="_blank"> -->
-              <el-dropdown-item>Profile</el-dropdown-item>
-            </a>
+            <!-- <a href="https://github.com/hashquark-io/nnsExplorer" target="_blank">
+              <el-dropdown-item command="profile">Profile</el-dropdown-item>
+            </a>-->
+            <el-dropdown-item command="profile">Profile</el-dropdown-item>
             <el-dropdown-item divided command="logout">Logout</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -192,6 +192,8 @@ export default {
       if (command == "logout") {
         localStorage.removeItem("nns_username");
         this.recompute = true;
+      } else if (command == "profile") {
+        this.$router.push({ name: "profile", params: {} });
       }
     },
     // Sidebar collapse
@@ -229,9 +231,15 @@ export default {
           const accountAddr = this.param.useraccount;
           const accountName = this.param.username;
           const signature = this.param.password; // use password rather than signature for test
+          const balance = 20000 + Math.floor(Math.random() * 50000); // use random value for test
+          const rewards = 0;
+          const isDelegator = false;
           const res = await nnsexplorer.signup({
             accountAddr,
             signature,
+            balance,
+            rewards,
+            isDelegator,
           });
           if (res) {
             this.$refs.signupBtn.disabled = false;
@@ -267,7 +275,6 @@ export default {
           }
 
           this.$refs.loginBtn.disabled = true;
-          this.$message.info("Waiting to complete ...");
           if (this.param.useraccount !== "") {
             // use password rather than password instead for test
             if (
@@ -303,6 +310,14 @@ export default {
       this.$message.error("It seems that you don't have a valid private key!");
     } else {
       localStorage.setItem("nns_useraccount", this.param.useraccount);
+
+      const existaccount = await nnsexplorer.existAccount(
+        this.param.useraccount
+      );
+      if (!existaccount) {
+        localStorage.removeItem("nns_username");
+        this.recompute = true;
+      }
     }
   },
   mounted() {

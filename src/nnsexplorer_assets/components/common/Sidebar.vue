@@ -72,7 +72,7 @@ export default {
         },
         {
           icon: "el-icon-data-line",
-          index: "javascript:;",
+          index: "neuronInfo",
           title: "Neuron Details",
           style: "font-size: 24px;",
         },

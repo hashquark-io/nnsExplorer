@@ -32,8 +32,8 @@
           <el-row :gutter="20" class="nns-dele-info">
             <el-col :span="6">
               <el-card shadow="never" :body-style="{padding: '0px'}">
-                <div class="dele-info-val">{{param.performance}}</div>
-                <div class="dele-info-key">Performance</div>
+                <div class="dele-info-val">{{param.annaulizedYield}}</div>
+                <div class="dele-info-key">7-day Annaulized Yield</div>
               </el-card>
             </el-col>
             <el-col :span="6">
@@ -78,7 +78,7 @@
             @click="submitForm()"
             size="medium"
           >Commit</el-button>
-          <el-button class="nns-delegator-btn" @click="resetForm()" size="medium">Cancel</el-button>
+          <el-button class="nns-delegator-btn" @click="cancel()" size="medium">Cancel</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -100,7 +100,7 @@ export default {
         amount: "",
         toAddr: "",
         neuronList: {},
-        performance: "",
+        annaulizedYield: "",
         desc: "",
         commission: "",
         totalVotes: "",
@@ -136,7 +136,7 @@ export default {
         for (var i = 0; i < list.length; i++) {
           if (toAddr.toLowerCase() === list[i].addr.toLowerCase()) {
             this.param.toAddr = list[i].addr;
-            this.param.performance = list[i].performance;
+            this.param.annaulizedYield = list[i].annaulizedYield;
             this.param.desc = list[i].desc;
             this.param.commission = list[i].commission;
             this.param.totalVotes = list[i].totalVotes;
@@ -158,19 +158,22 @@ export default {
       const amount = Number(this.param.amount);
 
       this.$refs.delegateBtn.disabled = true;
+      this.$message.info("Waiting to complete ...");
       if (await nnsexplorer.updateByDelegation(fromAddr, toAddr, amount)) {
         this.$message.success("New delegation successfully!");
+        var newBeDelegator = this.beDelegator;
+        newBeDelegator.beDelegatorDlgVisible = false;
+        this.$emit("beDelegatorChanged", newBeDelegator);
       } else {
-        this.$message.success("Delegation failed!");
+        this.$message.success("Delegation failed! Insufficient balance or you are already a neuron.");
+        this.param.balance = await nnsexplorer.getBalance(fromAddr);
       }
 
       this.param.amount = "";
-      var newBeDelegator = this.beDelegator;
-      newBeDelegator.beDelegatorDlgVisible = false;
-      this.$emit("beDelegatorChanged", newBeDelegator);
+
       this.$refs.delegateBtn.disabled = false;
     },
-    resetForm: function () {
+    cancel: function () {
       var newBeDelegator = this.beDelegator;
       newBeDelegator.beDelegatorDlgVisible = false;
       this.$emit("beDelegatorChanged", newBeDelegator);
@@ -179,12 +182,12 @@ export default {
   mounted() {
     this.param.toAddr = this.beDelegator.account;
     this.param.neuronList = this.beDelegator.neuronList;
-    this.param.performance = this.beDelegator.performance;
+    this.param.annaulizedYield = this.beDelegator.annaulizedYield;
     this.param.desc = this.beDelegator.desc;
     this.param.commission = this.beDelegator.commission;
     this.param.totalVotes = this.beDelegator.totalVotes;
     this.param.totalDelegations = this.beDelegator.totalDelegations;
-    this.param.balance = this.beDelegator.balance;
+    this.param.balance = this.beDelegator.balance.toString();
   },
 };
 </script>

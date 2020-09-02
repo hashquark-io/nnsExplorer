@@ -65,7 +65,7 @@
           <div class="grid-kvpair">
             <div>
               <div class="grid-key">TOTAL NEURONS</div>
-              <div class="grid-val">68</div>
+              <div class="grid-val">{{networkParam.totalNeurons}}</div>
             </div>
           </div>
         </el-card>
@@ -75,7 +75,7 @@
           <div class="grid-kvpair">
             <div>
               <div class="grid-key">TOTAL REWARD DISTRIBUTED</div>
-              <div class="grid-val">5,263,574 ICP</div>
+              <div class="grid-val">{{networkParam.totalRewards}}</div>
             </div>
           </div>
         </el-card>
@@ -107,7 +107,7 @@
           <div class="grid-kvpair">
             <div>
               <div class="grid-key">TOTAL VOTED BY NEURONS</div>
-              <div class="grid-val">33,762,787 ICP</div>
+              <div class="grid-val">{{networkParam.totalVoted}}</div>
             </div>
           </div>
         </el-card>
@@ -117,7 +117,7 @@
           <div class="grid-kvpair">
             <div>
               <div class="grid-key">TOTAL DELEGATED</div>
-              <div class="grid-val">12,554,952 ICP</div>
+              <div class="grid-val">{{networkParam.totalDelegated}}</div>
             </div>
           </div>
         </el-card>
@@ -135,15 +135,16 @@
           data.desc.toLowerCase().includes(search.toLowerCase()))"
           style="width: 100%"
           empty-text="No Data"
+          @cell-click="openNeuronDetails"
         >
-          <el-table-column label="Neuron ID" prop="addr" sortable width="600"></el-table-column>
+          <el-table-column label="Neuron ID" prop="addr" sortable width="500"></el-table-column>
+          <el-table-column label="Description" prop="desc" width="400"></el-table-column>
           <el-table-column
             label="Total Votes"
             prop="totalVotes"
             sortable
             :sort-method="(a, b) => sortMethod(a, b, 'totalVotes')"
           ></el-table-column>
-          <el-table-column label="Description" prop="desc"></el-table-column>
           <el-table-column
             label="Commision Rate"
             prop="commission"
@@ -151,10 +152,10 @@
             :sort-method="(a, b) => sortMethod(a, b, 'commission')"
           ></el-table-column>
           <el-table-column
-            label="Performance"
-            prop="performance"
+            label="7-day Annaulized Yield"
+            prop="annaulizedYield"
             sortable
-            :sort-method="(a, b) => sortMethod(a, b, 'performance')"
+            :sort-method="(a, b) => sortMethod(a, b, 'annaulizedYield')"
           ></el-table-column>
           <el-table-column align="right">
             <template slot="header">
@@ -174,12 +175,15 @@
 
     <!-- Become a Neuron dialog-->
     <div v-if="beNeuronParam.beNeuronDlgVisible">
-    <beNeuron :beNeuron="beNeuronParam" v-on:beNeuronChanged="handleBeNeuronChanged"></beNeuron>
+      <beNeuron :beNeuron="beNeuronParam" v-on:beNeuronChanged="handleBeNeuronChanged"></beNeuron>
     </div>
 
     <!-- Become a Delegator dialog-->
     <div v-if="beDelegatorParam.beDelegatorDlgVisible">
-    <beDelegator :beDelegator="beDelegatorParam" v-on:beDelegatorChanged="handleBeDelegatorChanged"></beDelegator>
+      <beDelegator
+        :beDelegator="beDelegatorParam"
+        v-on:beDelegatorChanged="handleBeDelegatorChanged"
+      ></beDelegator>
     </div>
   </div>
 </template>
@@ -190,10 +194,21 @@ import bus from "../common/bus";
 import vBeNeuron from "../dialog/BeNeuron.vue";
 import vBeDelegator from "../dialog/BeDelegator.vue";
 import nnsexplorer from "ic:canisters/nnsexplorer";
+import nnsexplorerSim from "ic:canisters/nnsexplorer_sim";
 export default {
   name: "Overview",
   data() {
     return {
+      networkParam: {
+        totalPropProc: "75",
+        ongoingProp: "3",
+        lastPropProc: "14 hours before",
+        avgPropInterv: "2 days",
+        totalNeurons: "0",
+        totalVoted: "0 ICP",
+        totalRewards: "0 ICP",
+        totalDelegated: "0 ICP",
+      },
       beNeuronParam: {
         beNeuronDlgVisible: false,
         account: "",
@@ -206,7 +221,7 @@ export default {
         commission: "",
         totalVotes: "",
         totalDelegations: "",
-        performance: "",
+        annaulizedYield: "",
         balance: 0,
         neuronList: {},
       },
@@ -219,19 +234,34 @@ export default {
     beDelegator: vBeDelegator,
   },
   methods: {
-    showBeNeuronDlg() {
+    async showBeNeuronDlg() {
       let username = localStorage.getItem("nns_username");
       if (username) {
-        this.beNeuronParam.beNeuronDlgVisible = true;
         this.beNeuronParam.account = localStorage.getItem("nns_useraccount");
-        this.beNeuronParam.balance = 10000; // TODO
+        this.beNeuronParam.balance = Number(
+          await nnsexplorer.getBalance(this.beNeuronParam.account)
+        );
+
+        this.beNeuronParam.beNeuronDlgVisible = true;
       } else {
         this.$message.error("You should login first!");
       }
     },
-    getNeuronList: async function () {
+    openNeuronDetails(row, column, cell, event) {
+      if (column.property === "addr") {
+        this.$router.push({
+          name: "neuronInfo",
+          params: { addr: row[column.property] },
+        });
+      }
+    },
+    async getNeuronList() {
+      var newtorkTotalVoted = 0;
+      var newtorkTotalDele = 0;
+
       const results = await nnsexplorer.getList();
       var list = JSON.parse(results);
+      this.nnsNeuronList = [];
       listloop: for (var i = 0; i < list.length; i++) {
         const accountAddr = list[i]["Account Address"];
         const description = list[i]["Description"];
@@ -240,21 +270,8 @@ export default {
           Number(list[i]["Self Staking"]) + Number(list[i]["Total Delegations"])
         ).toString();
         const totalDelegations = list[i]["Total Delegations"];
-        const performance = "100%"; // TODO
-
-        for (var j = 0; j < this.nnsNeuronList.length; j++) {
-          if (
-            this.nnsNeuronList[j].addr.toLowerCase() ===
-            accountAddr.toLowerCase()
-          ) {
-            this.nnsNeuronList[j].desc = description;
-            this.nnsNeuronList[j].commission = commission;
-            this.nnsNeuronList[j].totalVotes = totalVotes;
-            this.nnsNeuronList[j].totalDelegations = totalDelegations;
-            this.nnsNeuronList[j].performance = performance;
-            continue listloop;
-          }
-        }
+        const delegators = list[i]["Delegators"];
+        const annaulizedYield = "24%"; // TODO
 
         const neuronItem = {
           addr: accountAddr,
@@ -262,10 +279,26 @@ export default {
           commission: commission,
           totalVotes: totalVotes,
           totalDelegations: totalDelegations,
-          performance: performance,
+          annaulizedYield: annaulizedYield,
+          numDelegators: delegators,
         };
         this.nnsNeuronList.push(neuronItem);
+
+        newtorkTotalVoted +=
+          Number(list[i]["Self Staking"]) +
+          Number(list[i]["Total Delegations"]);
+        newtorkTotalDele += Number(totalDelegations);
       }
+
+      this.networkParam.totalNeurons = list.length;
+      this.networkParam.totalVoted =
+        toThousands(newtorkTotalVoted.toString()) + " ICP";
+      this.networkParam.totalRewards =
+        toThousands(
+          await nnsexplorerSim.totalRewardsDist(this.beNeuronParam.account)
+        ) + " ICP";
+      this.networkParam.totalDelegated =
+        toThousands(newtorkTotalDele.toString()) + " ICP";
     },
     handleBeNeuronChanged(e) {
       this.beNeuronParam = e;
@@ -275,11 +308,15 @@ export default {
       this.beDelegatorParam = e;
       this.getNeuronList();
     },
-    showBeDelegatorDlg(modelIdx) {
+    async showBeDelegatorDlg(modelIdx) {
       let username = localStorage.getItem("nns_username");
       if (username) {
         if (this.nnsNeuronList.length > 0) {
-          this.beDelegatorParam.balance = 10000; // TODO
+          this.beDelegatorParam.balance = Number(
+            await nnsexplorer.getBalance(
+              localStorage.getItem("nns_useraccount")
+            )
+          );
 
           this.beDelegatorParam.neuronList = this.nnsNeuronList;
           this.setDeleParamForDlg(modelIdx);
@@ -304,9 +341,9 @@ export default {
       this.beDelegatorParam.totalDelegations = this.nnsNeuronList[
         modelIdx
       ].totalDelegations;
-      this.beDelegatorParam.performance = this.nnsNeuronList[
+      this.beDelegatorParam.annaulizedYield = this.nnsNeuronList[
         modelIdx
-      ].performance;
+      ].annaulizedYield;
     },
     handleDelegate(index, row) {
       for (var i = 0; i < this.nnsNeuronList.length; i++) {
@@ -337,7 +374,7 @@ export default {
     } else {
       this.timer = setInterval(() => {
         this.getNeuronList();
-      }, 300000); // Refresh neuron list for every 5 minutes
+      }, 10000); // Refresh neuron list for every 10 second(s)
     }
   },
   destroyed() {
@@ -349,6 +386,10 @@ function replaceAll(str, c) {
   let tempArr = [];
   tempArr = str.split(c);
   return tempArr.join("");
+}
+
+function toThousands(num) {
+  return num.replace(/(\d)(?=(?:\d{3})+$)/g, "$1,");
 }
 </script>
 
@@ -390,7 +431,7 @@ function replaceAll(str, c) {
 }
 
 .grid-con-1 {
-  background: rgb(45, 140, 240);
+  background: rgb(75, 114, 240);
 }
 
 .grid-con-1 .grid-hint {
@@ -398,7 +439,7 @@ function replaceAll(str, c) {
 }
 
 .grid-con-2 {
-  background: rgb(45, 140, 240);
+  background: rgb(0, 197, 209);
 }
 
 .grid-con-2 .grid-hint {

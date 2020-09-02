@@ -15,6 +15,10 @@
                 "dist/nnsexplorer_assets/"
             ],
             "type": "assets"
+        },
+        "nnsexplorer_sim": {
+            "main": "src/nnsexplorer_sim/main.mo",
+            "type": "motoko"
         }
     },
     "defaults": {
@@ -22,7 +26,7 @@
             "packtool": ""
         }
     },
-    "dfx": "0.6.2",
+    "dfx": "0.6.4",
     "networks": {
         "local": {
             "bind": "127.0.0.1:8000",

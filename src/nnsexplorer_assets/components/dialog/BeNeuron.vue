@@ -1,12 +1,13 @@
 <template>
-  <el-dialog
-    title="Become a Neuron"
-    :visible.sync="beNeuron.beNeuronDlgVisible"
-    width="36%"
-    center
-  >
+  <el-dialog title="Become a Neuron" :visible.sync="beNeuron.beNeuronDlgVisible" width="36%" center>
     <div class="nns-be-neuron">
-      <el-form ref="beNeuron" :model="param" :rules="rules" label-position="left" label-width="160px">
+      <el-form
+        ref="beNeuron"
+        :model="param"
+        :rules="rules"
+        label-position="left"
+        label-width="160px"
+      >
         <el-form-item label="My Account" class="nns-form-label">
           <el-input class="nns-input" v-model="beNeuron.account" ref="accountInput" disabled></el-input>
         </el-form-item>
@@ -27,7 +28,11 @@
             autocomplete="off"
           ></el-input>
         </el-form-item>
-        <el-form-item class="nns-staking-amount nns-form-label" label="Staking Amount" prop="amount">
+        <el-form-item
+          class="nns-staking-amount nns-form-label"
+          label="Staking Amount"
+          prop="amount"
+        >
           <el-input
             class="nns-input"
             v-model.number="param.amount"
@@ -36,7 +41,7 @@
             autocomplete="off"
           ></el-input>
         </el-form-item>
-        <div class="nns-balance">My Balance: {{beNeuron.balance}} ICP</div>
+        <div class="nns-balance">My Balance: {{param.balance}} ICP</div>
         <el-form-item>
           <el-button
             class="nns-beneuron-btn"
@@ -67,6 +72,7 @@ export default {
         desc: "",
         commission: "",
         amount: "",
+        balance: "",
       },
       rules: {
         desc: [
@@ -102,25 +108,32 @@ export default {
     submitForm: async function () {
       const accountAddr = this.$refs.accountInput.value;
       const description = this.param.desc;
-      const commissionRate = this.param.commission.toString();
+      const commissionRate = Number(this.param.commission);
       const selfStaking = Number(this.param.amount);
 
       this.$refs.beNeuronBtn.disabled = true;
-      await nnsexplorer.createNeuron({
-        accountAddr,
-        description,
-        commissionRate,
-        selfStaking,
-      });
+      if (
+        await nnsexplorer.createNeuron({
+          accountAddr,
+          description,
+          commissionRate,
+          selfStaking,
+        })
+      ) {
+        this.$message.success("New neuron registered successfully!");
+        var newBeNeuron = {
+          beNeuronDlgVisible: false,
+        };
+        this.$emit("beNeuronChanged", newBeNeuron);
+      } else {
+        this.$message.error("New neuron registered failed! Insufficient balance or you are already a neuron or delegator.");
+        this.param.balance = await nnsexplorer.getBalance(accountAddr);
+      }
 
-      this.$message.success("New neuron registered successfully!");
       this.param.desc = "";
       this.param.commission = "";
       this.param.amount = "";
-      var newBeNeuron = {
-        beNeuronDlgVisible: false,
-      };
-      this.$emit("beNeuronChanged", newBeNeuron);
+
       this.$refs.beNeuronBtn.disabled = false;
     },
     resetForm: function () {
@@ -128,6 +141,9 @@ export default {
       this.param.commission = "";
       this.param.amount = "";
     },
+  },
+  mounted() {
+    this.param.balance = this.beNeuron.balance.toString();
   },
 };
 </script>

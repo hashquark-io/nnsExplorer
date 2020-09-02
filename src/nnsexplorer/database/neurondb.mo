@@ -4,6 +4,8 @@ import Iter "mo:base/Iter";
 import Option "mo:base/Option";
 import Nat64 "mo:base/Nat64";
 import Text "mo:base/Text";
+import List "mo:base/List";
+import Assoc "mo:base/AssocList";
 import Types "../types";
 import KeyID "../key/id";
 
@@ -13,35 +15,49 @@ module {
 
   public class NeuronHashMap() {
     // The "database" is just a local hash map
-    let hashMap = HashMap.HashMap<Text, Neuron>(1, isEq, Text.hash);
+    let hashMap = HashMap.HashMap<Text, Neuron>(1, Text.equal, Text.hash);
 
-    public func createOne(neuron: NewNeuron) {
+    public func createNeuron(neuron: NewNeuron) {
       hashMap.put(neuron.accountAddr, makeNeuron(neuron));
     };
 
-    public func updateDelegation(fromAddr: Text, toAddr: Text, amount: Nat64): Bool {
+    public func updateDelegation(fromAddr: Text, toAddr: Text, amt: Nat64): Bool {
       let existing = findNeuron(toAddr);
       switch (existing) {
         case (?existing) {
+          var selfStakingNew = existing.selfStaking;
+          var totalDelegationsNew = existing.totalDelegations;
+          var delegationsNew = existing.delegations;
           if (fromAddr == toAddr) {
-            let neuron = {
-              accountAddr = existing.accountAddr;
-              description = existing.description;
-              commissionRate = existing.commissionRate;
-              selfStaking = existing.selfStaking + amount;
-              totalDelegations = existing.totalDelegations;
-            };
-            hashMap.put(toAddr, neuron);
+            selfStakingNew += amt;
           } else {
-            let neuron = {
-              accountAddr = existing.accountAddr;
-              description = existing.description;
-              commissionRate = existing.commissionRate;
-              selfStaking = existing.selfStaking;
-              totalDelegations = existing.totalDelegations + amount;
+            totalDelegationsNew += amt;
+
+            var exist = false;
+            var amountNew: Nat64 = 0: Nat64;
+            var amountOld = Assoc.find<Text, Nat64>(existing.delegations, fromAddr, Text.equal);
+            switch (amountOld) {
+              case (null) { amountNew := amt; };
+              case (?amountOld) {
+                exist := true;
+                amountNew := amountOld + amt;
+              };
             };
-            hashMap.put(toAddr, neuron);
+
+            let (delegationsNewTemp, _) =
+            Assoc.replace<Text, Nat64>(existing.delegations, fromAddr, Text.equal, ?amountNew);
+            delegationsNew := delegationsNewTemp;
           };
+
+          let neuron: Neuron = {
+            accountAddr = existing.accountAddr;
+            description = existing.description;
+            commissionRate = existing.commissionRate;
+            selfStaking = selfStakingNew;
+            totalDelegations = totalDelegationsNew;
+            delegations = delegationsNew;
+          };
+          hashMap.put(toAddr, neuron);
 
           true
         };
@@ -49,8 +65,65 @@ module {
       };
     };
 
-    public func updateOne(neuron: Neuron) {
-      hashMap.put(neuron.accountAddr, neuron);
+    public func updateUnDelegation(fromAddr: Text, toAddr: Text, amt: Nat64): Bool {
+      let existing = findNeuron(toAddr);
+      switch (existing) {
+        case (?existing) {
+          var selfStakingNew = existing.selfStaking;
+          var totalDelegationsNew = existing.totalDelegations;
+          var delegationsNew = existing.delegations;
+          if (fromAddr == toAddr) {
+            selfStakingNew += amt; //TODO: update other delegators
+          } else {
+            totalDelegationsNew -= amt;
+
+            var exist = false;
+            var amountNew: Nat64 = 0: Nat64;
+            var amountOld = Assoc.find<Text, Nat64>(existing.delegations, fromAddr, Text.equal);
+            switch (amountOld) {
+              case (null) { return false; };
+              case (?amountOld) {
+                exist := true;
+                amountNew := amountOld - amt;
+              };
+            };
+
+            if (amountNew == Nat64.fromNat(0)) {
+              let (delegationsNewTemp, _) =
+              Assoc.replace<Text, Nat64>(existing.delegations, fromAddr, Text.equal, null);
+              delegationsNew := delegationsNewTemp;
+            } else {
+              let (delegationsNewTemp, _) =
+              Assoc.replace<Text, Nat64>(existing.delegations, fromAddr, Text.equal, ?amountNew);
+              delegationsNew := delegationsNewTemp;
+            };
+            
+          };
+
+          let neuron: Neuron = {
+            accountAddr = existing.accountAddr;
+            description = existing.description;
+            commissionRate = existing.commissionRate;
+            selfStaking = selfStakingNew;
+            totalDelegations = totalDelegationsNew;
+            delegations = delegationsNew;
+          };
+          hashMap.put(toAddr, neuron);
+
+          true
+        };
+        case (null) { false };
+      };
+    };
+
+    public func updateNeuron(neuron: Neuron) {
+      let existing = findNeuron(neuron.accountAddr);
+      switch (existing) {
+        case (null) { };
+        case (?existing) { 
+          hashMap.put(neuron.accountAddr, neuron); 
+        };
+      };
     };
 
     public func findNeuron(accountAddr: Text): ?Neuron {
@@ -92,6 +165,7 @@ module {
         commissionRate = neuron.commissionRate;
         selfStaking = neuron.selfStaking;
         totalDelegations = Nat64.fromNat(0);
+        delegations = List.nil<(Text, Nat64)>();
       }
     };
 
@@ -115,6 +189,4 @@ module {
       false
     };
   };
-
-  func isEq(x: Text, y: Text): Bool { x == y };
 };
