@@ -4,15 +4,15 @@
 
 ### Overview
 
-![Screenshots](screenshoots/screenshoot1.png)
+![Screenshots](screenshots/screenshot1.png)
 
 ### Profile page
 
-![Screenshots](screenshoots/screenshoot2.png)
+![Screenshots](screenshots/screenshot2.png)
 
 ### Neuron details
 
-![Screenshots](screenshoots/screenshoot3.png)
+![Screenshots](screenshots/screenshot3.png)
 
 ## Installation steps
 
