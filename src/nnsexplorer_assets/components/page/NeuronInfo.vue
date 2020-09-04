@@ -60,9 +60,9 @@
   </div>
 </template>
 <script>
-import delegateChart from "../charts/delegateChart";
-import dailyDelegate from "../charts/dailyDelegate";
-import dailyRewards from "../charts/dailyRewards";
+import delegateChart from "../chart/delegateChart";
+import dailyDelegate from "../chart/dailyDelegate";
+import dailyRewards from "../chart/dailyRewards";
 import nnsexplorer from "ic:canisters/nnsexplorer";
 export default {
   data() {

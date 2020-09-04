@@ -191,7 +191,7 @@
 <script>
 import bus from "../common/bus";
 import { thousandth, Mathfloor } from "../common/utils";
-import dailyRewards from "../charts/dailyRewards";
+import dailyRewards from "../chart/dailyRewards";
 import nnsexplorer from "ic:canisters/nnsexplorer";
 export default {
   name: "dashboard",
