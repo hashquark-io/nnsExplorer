@@ -165,7 +165,7 @@ export default {
         newBeDelegator.beDelegatorDlgVisible = false;
         this.$emit("beDelegatorChanged", newBeDelegator);
       } else {
-        this.$message.success("Delegation failed! Insufficient balance or you are already a neuron.");
+        this.$message.error("Delegation failed! Insufficient balance or you are already a neuron.");
         this.param.balance = await nnsexplorer.getBalance(fromAddr);
       }
 

@@ -87,7 +87,8 @@ function generateWebpackConfigForCanister(name, info) {
                     options: {
                         //"babelrc": false,
                         "plugins": [
-                            "dynamic-import-webpack"
+                            "dynamic-import-webpack",
+                            "transform-object-rest-spread"
                         ]
                     }
                 },

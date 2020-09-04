@@ -3,20 +3,25 @@ import Prelude "mo:base/Prelude";
 import Prim "mo:prim";
 import Nat "mo:base/Nat";
 import Nat64 "mo:base/Nat64";
+import Int "mo:base/Int";
 import List "mo:base/List";
 import Principal "mo:base/Principal";
 import AccountDB "./database/accountdb";
 import NeuronDB "./database/neurondb";
+import ProposalDB "./database/proposaldb";
 import Types "./types";
 import KeyID "./key/id";
 
 type DFNAccount = Types.DFNAccount;
 type NewNeuron = Types.NewNeuron;
+type NewDFNProposal = Types.NewDFNProposal;
 type Neuron = Types.Neuron;
+type Proposal = Types.DFNProposal;
 
 actor nnsexplorer {
   var accountDb: AccountDB.AccountHashMap = AccountDB.AccountHashMap();
   var neuronDb: NeuronDB.NeuronHashMap = NeuronDB.NeuronHashMap();
+  var proposaldb: ProposalDB.ProposalHashMap = ProposalDB.ProposalHashMap();
 
   // Healthcheck
 
@@ -54,19 +59,19 @@ actor nnsexplorer {
     };
   };
 
-  public query func getAccount(addr: Text): async ?DFNAccount {
+  public shared query func getAccount(addr: Text): async ?DFNAccount {
     accountDb.findAccount(addr)
   };
 
-  public query func getBalance(addr: Text): async Text {
+  public shared query func getBalance(addr: Text): async Text {
     Nat64.toText(accountDb.balance(addr))
   };
 
-  public query func getRewards(addr: Text): async Text {
+  public shared query func getRewards(addr: Text): async Text {
     Nat64.toText(accountDb.rewards(addr))
   };
 
-  public query func getDelegations(addr: Text): async Text {
+  public shared query func getDelegations(addr: Text): async Text {
     let neuronList = neuronDb.findList();
     var fullResultStr = "[";
     var i = 0;
@@ -195,7 +200,7 @@ actor nnsexplorer {
     };
   };
 
-  public query func getNeuron(addr: Text): async Neuron {
+  public shared query func getNeuron(addr: Text): async Neuron {
     let existing = neuronDb.findNeuron(addr);
     switch (existing) {
       case (?existing) { existing };
@@ -212,11 +217,11 @@ actor nnsexplorer {
     };
   };
 
-  public query func search(term: Text): async [Neuron] {
+  public shared query func search(term: Text): async [Neuron] {
     neuronDb.findBy(term)
   };
 
-  public query func getList(): async Text {
+  public shared query func getNeuronList(): async Text {
     var results = neuronDb.findList();
     var fullResultStr = "[";
     var i = 0;
@@ -239,7 +244,128 @@ actor nnsexplorer {
     return fullResultStr;
   };
 
-  // nnsexplorer_sim
+  // Proposals
+
+  public shared(msg) func createProposal(newProposal: NewDFNProposal): async () {
+    proposaldb.createProposal(newProposal);
+  };
+
+  public shared(msg) func updateProposalStatus(id: Text, newStatus: Text): async () {
+    proposaldb.updateStatus(id, newStatus);
+  };
+
+  public shared(msg) func voteForProposal(account: Text, id: Text, approve: Bool): async Bool {
+    let existing = proposaldb.findProposalByID(id);
+    switch (existing) {
+      case (?existing) {
+        proposaldb.voteProposal(account, id, approve);
+        true
+      };
+      case (null) { false };
+    };
+  };
+
+  public shared query func getProposalID(proposal: Proposal): async Text {
+    proposaldb.calProposalID(proposal);
+  };
+
+  public shared query func getProposalContent(id: Text): async Text {
+    let existing = proposaldb.findProposalByID(id);
+    switch (existing) {
+      case (?existing) { existing.details };
+      case (null) { "" };
+    };
+  };
+
+  public shared query func getProposalApprovals(id: Text): async Text {
+    let existing = proposaldb.findProposalByID(id);
+    switch (existing) {
+      case (null) { "" };
+      case (?existing) {
+        var fullResultStr = "[";
+        
+        var str = "";
+        var i = 0;
+        func getApprovals((addr, approve): (Text, Bool)) {
+          if (approve != true) {
+            return
+          };
+          let neuron = neuronDb.findNeuron(addr);
+          switch (neuron) {
+            case (null) { };
+            case (?neuron) {
+              if (i > 0) {
+                fullResultStr #= ",";
+              };
+              i += 1;
+
+              str := "{\n\"Account\": \"" # addr # "\",\n\"Votes\": \"" # Nat64.toText(neuron.selfStaking + neuron.totalDelegations) # "\"\n}";
+              fullResultStr #= str;
+            };
+          };
+        };
+        List.iterate<(Text, Bool)>(existing.votes, getApprovals);
+
+        fullResultStr #= "]";
+        return fullResultStr
+      };
+    };
+  };
+
+  public shared query func getProposalDisapprovals(id: Text): async Text {
+    let existing = proposaldb.findProposalByID(id);
+    switch (existing) {
+      case (null) { "" };
+      case (?existing) {
+        var fullResultStr = "[";
+        
+        var str = "";
+        var i = 0;
+        func getDisapprovals((addr, approve): (Text, Bool)) {
+          if (approve == true) {
+            return
+          };
+          let neuron = neuronDb.findNeuron(addr);
+          switch (neuron) {
+            case (null) { };
+            case (?neuron) {
+              if (i > 0) {
+                fullResultStr #= ",";
+              };
+              i += 1;
+
+              str := "{\n\"Account\": \"" # addr # "\",\n\"Votes\": \"" # Nat64.toText(neuron.selfStaking + neuron.totalDelegations) # "\"\n}";
+              fullResultStr #= str;
+            };
+          };
+        };
+        List.iterate<(Text, Bool)>(existing.votes, getDisapprovals);
+
+        fullResultStr #= "]";
+        return fullResultStr
+      };
+    };
+  };
+
+  public shared query func getProposalList(): async Text {
+    var results = proposaldb.findList();
+    var fullResultStr = "[";
+    var i = 0;
+    for (result in results.vals()) {
+      if (i > 0) {
+        fullResultStr #= ",";
+      };
+      i += 1;
+
+      let (account, time) = result.created;
+      let str = "{\n\"Title\": \"" # result.title # "\",\n\"Created By\": \"" # account # "\",\n\"Create Time\": \"" # Int.toText(time) # "\",\n\"Proposal ID\": \"" # proposaldb.calProposalID(result) # "\",\n\"Status\": \"" # result.status # "\",\n\"Excution Time\": \"" # Int.toText(result.excutionTime) # "\"\n}";
+      fullResultStr #= str;
+    };
+    fullResultStr #= "]";
+    return fullResultStr;
+  };
+
+  // nnsexplorer_sim for test
 
   public shared func signupTest(account: DFNAccount): async () {
     accountDb.createAccount(account)
@@ -261,8 +387,18 @@ actor nnsexplorer {
     };
   };
 
-  public query func getListTest(): async [Neuron] {
+  public query func getNeuronListTest(): async [Neuron] {
     neuronDb.findList()
+  };
+
+  public shared(msg) func createProposalTest(newProposal: NewDFNProposal): async () {
+    proposaldb.createProposal(newProposal);
+  };
+
+  public shared(msg) func createProposalsTest(newProposals: [NewDFNProposal]): async () {
+    for (newProposal in newProposals.vals()) {
+      proposaldb.createProposal(newProposal);
+    };
   };
 
   // User Auth

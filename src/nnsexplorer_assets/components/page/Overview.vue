@@ -259,7 +259,7 @@ export default {
       var newtorkTotalVoted = 0;
       var newtorkTotalDele = 0;
 
-      const results = await nnsexplorer.getList();
+      const results = await nnsexplorer.getNeuronList();
       var list = JSON.parse(results);
       this.nnsNeuronList = [];
       listloop: for (var i = 0; i < list.length; i++) {

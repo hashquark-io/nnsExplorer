@@ -131,7 +131,7 @@ export default {
   methods: {
     delegateToChanged(val) {},
     async getNeuronList() {
-      const results = await nnsexplorer.getList();
+      const results = await nnsexplorer.getNeuronList();
       var list = JSON.parse(results);
       this.param.neuronList = [];
       listloop: for (var i = 0; i < list.length; i++) {

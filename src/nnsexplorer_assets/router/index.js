@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Home from '../components/common/Home.vue';
 import Overview from '../components/page/Overview.vue';
 import NeuronInfo from '../components/page/NeuronInfo.vue';
+import Proposals from '../components/page/Proposals.vue';
 import Profile from '../components/page/Profile.vue';
 import I18n from '../components/page/I18n.vue';
 import P404 from '../components/page/404.vue';
@@ -35,6 +36,12 @@ export default new Router({
                     name: 'profile',
                     component: Profile,
                     meta: { title: 'profile' }
+                },
+                {
+                    path: '/proposals',
+                    name: 'proposals',
+                    component: Proposals,
+                    meta: { title: 'proposals' }
                 },
                 // {
                 //     // 中英文切换组件

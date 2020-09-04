@@ -5,7 +5,6 @@ import Option "mo:base/Option";
 import Text "mo:base/Text";
 import Nat64 "mo:base/Nat64";
 import Types "../types";
-import KeyID "../key/id";
 
 module {
   type DFNAccount = Types.DFNAccount;

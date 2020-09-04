@@ -6,6 +6,7 @@ import VueI18n from 'vue-i18n';
 import { messages } from './components/common/i18n';
 import 'element-ui/lib/theme-chalk/index.css';
 // import './assets/css/theme-green/index.css';
+import ElementLocale from 'element-ui/lib/locale'
 import './assets/css/icon.css';
 import 'babel-polyfill';
 
@@ -15,9 +16,10 @@ Vue.use(ElementUI, {
     size: 'small'
 });
 const i18n = new VueI18n({
-    locale: 'zh',
+    locale: 'en',
     messages
 });
+ElementLocale.i18n((key, value) => i18n.t(key, value))
 
 router.beforeEach((to, from, next) => {
     document.title = `${to.meta.title} | DFINITY NNS Explorer`;

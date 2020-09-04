@@ -7,7 +7,6 @@ import Text "mo:base/Text";
 import List "mo:base/List";
 import Assoc "mo:base/AssocList";
 import Types "../types";
-import KeyID "../key/id";
 
 module {
   type NewNeuron = Types.NewNeuron;

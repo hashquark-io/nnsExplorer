@@ -26,11 +26,20 @@ module {
     delegations: Assoc.AssocList<Text, Nat64>;
   };
 
+  type Time = Int;
+  public type NewDFNProposal = {
+    title: Text;
+    details: Text;
+    createdBy: Text;
+    excutionTime: Time;
+  };
+
   public type DFNProposal = {
     title: Text;
-    content: Text;
-    voteNeurons: [Text];
-    //signatures: [Text];
-    totalRewards: Nat64;
+    details: Text;
+    created: (Text, Time);
+    votes: Assoc.AssocList<Text, Bool>;
+    excutionTime: Time;
+    status: Text; // "active", "passed", "failed", "excuted"
   };
 };

@@ -1,3 +1,4 @@
+import Prim "mo:prim";
 import Nat64 "mo:base/Nat64";
 import Array "mo:base/Array";
 import Text "mo:base/Text";
@@ -95,6 +96,29 @@ let neurons =
       }
    ];
 
+// table of mock proposals
+let proposals =
+   [ 
+       {
+        title = "Adjust new mining identity security deposit to 2,135 ICP";
+        details = "content of \"Adjust new mining identity security deposit to 2,135 ICP\"";
+        createdBy = "A19BA9C73839E92644491D0901071267D115D1FE1A1A4870C3DB5CA50228";
+        excutionTime = 0: Int;
+      },
+      {
+        title = "Reduce ICP emmissions by 10%";
+        details = "content of \"Reduce ICP emmissions by 10%\"";
+        createdBy = "A5AEC167AC201B67C6EF6B267361B3D2595C2EC798EB8D7DD52489BC02DC";
+        excutionTime = 0: Int;
+      },
+      {
+        title = "Add USDT support";
+        details = "content of \"Add USDT support\"";
+        createdBy = "CE1D6EDC4B7383D84187BB9056659DC6135EDF239F0E8DD0FB518A510257";
+        excutionTime = 0: Int;
+      },
+   ];
+
 type DFNAccount = Types.DFNAccount;
 type Neuron = Types.Neuron;
 
@@ -127,6 +151,14 @@ actor nnsexplorer_sim {
 
     await NNSExplorer.signupTests(accounts);
     await NNSExplorer.createTestNeurons(neurons);
+
+    let p: async () = NNSExplorer.createProposalsTest(proposals);
+  };
+
+  public func createTestProposal() : async Bool {
+    let now = Prim.nat64ToNat(Prim.time()/1000000000);
+    await NNSExplorer.createProposalTest(proposals[now%3]);
+    true
   };
 
   // dfx canister call nnsexplorer_sim start
@@ -149,7 +181,7 @@ actor nnsexplorer_sim {
 
   func startLoop() : async () {
     while(started) {
-      let existings = await NNSExplorer.getListTest();
+      let existings = await NNSExplorer.getNeuronListTest();
       var accounts: [DFNAccount] = [];
       var netTotalVotesTemp: Nat64 = 0: Nat64;
       var delegatorsTemp: Assoc.AssocList<Text, Nat64> = List.nil<(Text, Nat64)>();

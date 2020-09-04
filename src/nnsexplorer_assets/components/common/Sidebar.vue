@@ -56,19 +56,9 @@ export default {
         },
         {
           icon: "el-icon-document",
-          index: "javascript:;",
+          index: "proposals",
           title: "Proposals",
           style: "font-size: 24px;",
-          // subs: [
-          //   {
-          //     index: "form",
-          //     title: "基本表单",
-          //   },
-          //   {
-          //     index: "markdown",
-          //     title: "markdown编辑器",
-          //   },
-          // ],
         },
         {
           icon: "el-icon-data-line",
@@ -91,7 +81,7 @@ export default {
     },
   },
   created() {
-    // 通过 Event Bus 进行组件间通信，来折叠侧边栏
+    // Collapse the side bar through Event Bus
     bus.$on("collapse", (msg) => {
       this.collapse = msg;
       bus.$emit("collapse-content", msg);
