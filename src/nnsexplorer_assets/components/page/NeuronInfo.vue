@@ -27,7 +27,7 @@
         </div>
         <p class="legend-item">
           <span class="grey label">Self Votes</span>
-          <span v-html="formatNumStyle(curNeuronInfo.totalVotes, 16, 14)"></span>
+          <span v-html="formatNumStyle((Number(curNeuronInfo.totalVotes) - Number(curNeuronInfo.totalDelegations)).toString(), 16, 14)"></span>
           <span style="margin-left: 10px;">ICP</span>
         </p>
         <p class="legend-item">

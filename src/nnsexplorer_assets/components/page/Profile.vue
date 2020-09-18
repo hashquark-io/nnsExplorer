@@ -326,6 +326,8 @@ export default {
       await this.update();
     },
     async unDelegate(from, to, amount) {
+      console.info("unDelegate(" + from + ", " + to + ", " + amount.toString() + ")"); //Test
+
       this.$message.info("Waiting to complete ...");
       this.$refs.unDelegateBtn.disabled = true;
       const ret = await nnsexplorer.updateByUnDelegation(from, to, amount);
