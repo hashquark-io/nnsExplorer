@@ -8,121 +8,121 @@ import Types "../nnsexplorer/types";
 import NNSExplorer "canister:nnsexplorer";
 import Debug "mo:base/Debug";
 
-// table of mock accounts
-let accounts =
-   [ 
-       {
-        accountAddr = "A5AEC167AC201B67C6EF6B267361B3D2595C2EC798EB8D7DD52489BC02DC";
-        signature = "Dominic Williams";
-        balance = 10000: Nat64;
-        rewards = 0: Nat64;
-        isDelegator = false;
-      },
-      {
-        accountAddr = "A19BA9C73839E92644491D0901071267D115D1FE1A1A4870C3DB5CA50228";
-        signature = "Diego Prats";
-        balance = 10000: Nat64;
-        rewards = 0: Nat64;
-        isDelegator = false;
-      },
-      {
-        accountAddr = "CE1D6EDC4B7383D84187BB9056659DC6135EDF239F0E8DD0FB518A510257";
-        signature = "Jan Camenisch";
-        balance = 10000: Nat64;
-        rewards = 0: Nat64;
-        isDelegator = false;
-      },
-      {
-        accountAddr = "CEDDBCA8FA100E5E177F1E3934E98A366CEDFB3968D8915E6E1933970224";
-        signature = "Donald Trump";
-        balance = 10000: Nat64;
-        rewards = 0: Nat64;
-        isDelegator = false;
-      },
-      {
-        accountAddr = "B5B5E0924288954CE5427AC456366E7DD50837723DA10D04998AD7CE0273";
-        signature = "Sanam Saaber";
-        balance = 10000: Nat64;
-        rewards = 0: Nat64;
-        isDelegator = false;
-      },
-      {
-        accountAddr = "3BA830E39688DE354E40084C21FCB0C86E190DBDB322021C2A4843C002D5";
-        signature = "Barack Obama";
-        balance = 10000: Nat64;
-        rewards = 0: Nat64;
-        isDelegator = false;
-      }
-   ];
-
-// table of mock neurons
-let neurons =
-   [ 
-       {
-        accountAddr = "A5AEC167AC201B67C6EF6B267361B3D2595C2EC798EB8D7DD52489BC02DC";
-        description = "Dominic Williams - Founder & Chief Scientist";
-        commissionRate = 5;
-        selfStaking = 300000: Nat64;
-      },
-      {
-        accountAddr = "A19BA9C73839E92644491D0901071267D115D1FE1A1A4870C3DB5CA50228";
-        description = "Diego Prats - Director of Product";
-        commissionRate = 10;
-        selfStaking = 200000: Nat64;
-      },
-      {
-        accountAddr = "CE1D6EDC4B7383D84187BB9056659DC6135EDF239F0E8DD0FB518A510257";
-        description = "Jan Camenisch - VP of Research";
-        commissionRate = 10;
-        selfStaking = 50000: Nat64;
-      },
-      {
-        accountAddr = "CEDDBCA8FA100E5E177F1E3934E98A366CEDFB3968D8915E6E1933970224";
-        description = "Donald Trump - President";
-        commissionRate = 5;
-        selfStaking = 900000: Nat64;
-      },
-      {
-        accountAddr = "B5B5E0924288954CE5427AC456366E7DD50837723DA10D04998AD7CE0273";
-        description = "Sanam Saaber - General Counsel";
-        commissionRate = 10;
-        selfStaking = 100000: Nat64;
-      },
-      {
-        accountAddr = "3BA830E39688DE354E40084C21FCB0C86E190DBDB322021C2A4843C002D5";
-        description = "Barack Obama - President (Retired)";
-        commissionRate = 20;
-        selfStaking = 600000: Nat64;
-      }
-   ];
-
-// table of mock proposals
-let proposals =
-   [ 
-       {
-        title = "Adjust new mining identity security deposit to 2,135 ICP";
-        details = "content of \"Adjust new mining identity security deposit to 2,135 ICP\"";
-        createdBy = "A19BA9C73839E92644491D0901071267D115D1FE1A1A4870C3DB5CA50228";
-        excutionTime = 0: Int;
-      },
-      {
-        title = "Reduce ICP emmissions by 10%";
-        details = "content of \"Reduce ICP emmissions by 10%\"";
-        createdBy = "A5AEC167AC201B67C6EF6B267361B3D2595C2EC798EB8D7DD52489BC02DC";
-        excutionTime = 0: Int;
-      },
-      {
-        title = "Add USDT support";
-        details = "content of \"Add USDT support\"";
-        createdBy = "CE1D6EDC4B7383D84187BB9056659DC6135EDF239F0E8DD0FB518A510257";
-        excutionTime = 0: Int;
-      },
-   ];
-
-type DFNAccount = Types.DFNAccount;
-type Neuron = Types.Neuron;
-
 actor nnsexplorer_sim {
+  // table of mock accounts
+  let accounts =
+    [ 
+        {
+          accountAddr = "A5AEC167AC201B67C6EF6B267361B3D2595C2EC798EB8D7DD52489BC02DC";
+          signature = "Dominic Williams";
+          balance = 10000: Nat64;
+          rewards = 0: Nat64;
+          isDelegator = false;
+        },
+        {
+          accountAddr = "A19BA9C73839E92644491D0901071267D115D1FE1A1A4870C3DB5CA50228";
+          signature = "Diego Prats";
+          balance = 10000: Nat64;
+          rewards = 0: Nat64;
+          isDelegator = false;
+        },
+        {
+          accountAddr = "CE1D6EDC4B7383D84187BB9056659DC6135EDF239F0E8DD0FB518A510257";
+          signature = "Jan Camenisch";
+          balance = 10000: Nat64;
+          rewards = 0: Nat64;
+          isDelegator = false;
+        },
+        {
+          accountAddr = "CEDDBCA8FA100E5E177F1E3934E98A366CEDFB3968D8915E6E1933970224";
+          signature = "Donald Trump";
+          balance = 10000: Nat64;
+          rewards = 0: Nat64;
+          isDelegator = false;
+        },
+        {
+          accountAddr = "B5B5E0924288954CE5427AC456366E7DD50837723DA10D04998AD7CE0273";
+          signature = "Sanam Saaber";
+          balance = 10000: Nat64;
+          rewards = 0: Nat64;
+          isDelegator = false;
+        },
+        {
+          accountAddr = "3BA830E39688DE354E40084C21FCB0C86E190DBDB322021C2A4843C002D5";
+          signature = "Barack Obama";
+          balance = 10000: Nat64;
+          rewards = 0: Nat64;
+          isDelegator = false;
+        }
+    ];
+
+  // table of mock neurons
+  let neurons =
+    [ 
+        {
+          accountAddr = "A5AEC167AC201B67C6EF6B267361B3D2595C2EC798EB8D7DD52489BC02DC";
+          description = "Dominic Williams - Founder & Chief Scientist";
+          commissionRate = 5;
+          selfStaking = 300000: Nat64;
+        },
+        {
+          accountAddr = "A19BA9C73839E92644491D0901071267D115D1FE1A1A4870C3DB5CA50228";
+          description = "Diego Prats - Director of Product";
+          commissionRate = 10;
+          selfStaking = 200000: Nat64;
+        },
+        {
+          accountAddr = "CE1D6EDC4B7383D84187BB9056659DC6135EDF239F0E8DD0FB518A510257";
+          description = "Jan Camenisch - VP of Research";
+          commissionRate = 10;
+          selfStaking = 50000: Nat64;
+        },
+        {
+          accountAddr = "CEDDBCA8FA100E5E177F1E3934E98A366CEDFB3968D8915E6E1933970224";
+          description = "Donald Trump - President";
+          commissionRate = 5;
+          selfStaking = 900000: Nat64;
+        },
+        {
+          accountAddr = "B5B5E0924288954CE5427AC456366E7DD50837723DA10D04998AD7CE0273";
+          description = "Sanam Saaber - General Counsel";
+          commissionRate = 10;
+          selfStaking = 100000: Nat64;
+        },
+        {
+          accountAddr = "3BA830E39688DE354E40084C21FCB0C86E190DBDB322021C2A4843C002D5";
+          description = "Barack Obama - President (Retired)";
+          commissionRate = 20;
+          selfStaking = 600000: Nat64;
+        }
+    ];
+
+  // table of mock proposals
+  let proposals =
+    [ 
+        {
+          title = "Adjust new mining identity security deposit to 2,135 ICP";
+          details = "content of \"Adjust new mining identity security deposit to 2,135 ICP\"";
+          createdBy = "A19BA9C73839E92644491D0901071267D115D1FE1A1A4870C3DB5CA50228";
+          excutionTime = 0: Int;
+        },
+        {
+          title = "Reduce ICP emmissions by 10%";
+          details = "content of \"Reduce ICP emmissions by 10%\"";
+          createdBy = "A5AEC167AC201B67C6EF6B267361B3D2595C2EC798EB8D7DD52489BC02DC";
+          excutionTime = 0: Int;
+        },
+        {
+          title = "Add USDT support";
+          details = "content of \"Add USDT support\"";
+          createdBy = "CE1D6EDC4B7383D84187BB9056659DC6135EDF239F0E8DD0FB518A510257";
+          excutionTime = 0: Int;
+        },
+    ];
+
+  type DFNAccount = Types.DFNAccount;
+  type Neuron = Types.Neuron;
+
   var inited = false;
   var started = false;
   var rewardAmount: Nat64 = 256: Nat64;

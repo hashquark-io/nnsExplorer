@@ -12,13 +12,13 @@ import ProposalDB "./database/proposaldb";
 import Types "./types";
 import KeyID "./key/id";
 
-type DFNAccount = Types.DFNAccount;
-type NewNeuron = Types.NewNeuron;
-type NewDFNProposal = Types.NewDFNProposal;
-type Neuron = Types.Neuron;
-type Proposal = Types.DFNProposal;
-
 actor nnsexplorer {
+  type DFNAccount = Types.DFNAccount;
+  type NewNeuron = Types.NewNeuron;
+  type NewDFNProposal = Types.NewDFNProposal;
+  type Neuron = Types.Neuron;
+  type Proposal = Types.DFNProposal;
+
   var accountDb: AccountDB.AccountHashMap = AccountDB.AccountHashMap();
   var neuronDb: NeuronDB.NeuronHashMap = NeuronDB.NeuronHashMap();
   var proposaldb: ProposalDB.ProposalHashMap = ProposalDB.ProposalHashMap();
